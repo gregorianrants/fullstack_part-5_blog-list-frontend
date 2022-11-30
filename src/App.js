@@ -18,18 +18,39 @@ const App = () => {
     }
   }, [user])
 
+  useEffect(()=>{
+    const signedInUser = JSON.parse(localStorage.getItem('signedInUser'))
+    console.log(signedInUser)
+    if(signedInUser){
+      blogService.setToken(signedInUser.token)
+      setUser(signedInUser)
+    }
+  },[])
+
   const handleLogin= async (e)=>{
     e.preventDefault()
     const user = await loginService.login({username,password})
     blogService.setToken(user.token)
+    localStorage.setItem('signedInUser',JSON.stringify(user))
     setUser(user)
   }
+
+  
+
+ 
+    const handleLogout = ()=>{
+      localStorage.removeItem('signedInUser')
+      setUser(null)
+    }
+
+
+  
 
   console.log('user',user)
   const renderBlogs = ()=>(
     <div>
       <h2>blogs</h2>
-     <p>{user.name} logged in</p>
+     <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
      <div>
      {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
